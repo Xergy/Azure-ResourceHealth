@@ -76,11 +76,10 @@ $cachedTokens = $tokenCache.ReadItems() `
         | Sort-Object -Property ExpiresOn -Descending
 $accessToken = $cachedTokens[0].AccessToken
 
-while($true)
-{
+#while($true)
+#{
     foreach($resourceGroup in $ResourceGroups)
     {
-        
         $provider = 'providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2015-01-01'
         $uri = "$ManagementUri/subscriptions/$SubscriptionId/resourceGroups/$resourceGroup/$provider"
 
@@ -89,7 +88,9 @@ while($true)
             -Uri $uri `
             -Headers @{ "Authorization" = "Bearer " + $accessToken }
 
-        foreach($resource in $responce.value)
+        $responce = $responce.value | Where-Object {$_.id -like "*Microsoft.Compute/virtualMachines*" }
+
+        foreach($resource in $responce )
         {
             $resource.id
 
@@ -125,5 +126,5 @@ while($true)
         }
     }
 
-    Start-Sleep -Seconds 60
-}
+#    Start-Sleep -Seconds 60
+#}
